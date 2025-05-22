@@ -1,36 +1,44 @@
-# This is a basic workflow to help you get started with Actions
+name: Build and Deploy to Contabo
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  deploy:
+    name: Deploy to Contabo VPS
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.CONTABO_SSH_KEY }}
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: 🚀 Upload Files to VPS (rsync)
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ./ \
+            ${{ secrets.CONTABO_USER }}@${{ secrets.CONTABO_HOST }}:/home/${{ secrets.CONTABO_USER }}/app/
+
+      - name: 🐳 Deploy Docker Container on VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.CONTABO_USER }}@${{ secrets.CONTABO_HOST }} << 'EOF'
+            set -e
+            cd ~/app
+
+            echo "Building Docker image..."
+            docker build -t my-app .
+
+            echo "Stopping old container (if exists)..."
+            docker stop my-app || true
+            docker rm my-app || true
+
+            echo "Starting new container..."
+            docker run -d --name my-app -p 80:3000 my-app
+
+            echo "Deployment complete 🎉"
+          EOF
