@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                          // Phiên bản JS đầu ra hiện đại, hỗ trợ async/await
+    "module": "CommonJS",                        // Module cho Node.js, cũng có thể dùng "ESNext" nếu bạn dùng ES Modules
+    "moduleResolution": "Node",                  // Giúp TypeScript tìm đúng các package
+    "outDir": "./dist",                          // Thư mục build ra
+    "rootDir": "./src",                          // Thư mục nguồn code TS
+    "esModuleInterop": true,                     // Hỗ trợ import mặc định từ các module CommonJS
+    "forceConsistentCasingInFileNames": true,   // Đảm bảo tên file dùng nhất quán
+    "strict": true,                              // Bật strict mode (tốt cho code chất lượng)
+    "skipLibCheck": true,                        // Bỏ qua kiểm tra types thư viện để build nhanh hơn
+    "resolveJsonModule": true,                   // Cho phép import file json
+    "noImplicitAny": true,                       // Bắt phải khai báo type rõ ràng
+    "strictNullChecks": true,                    // Kiểm tra null và undefined
+    "noUnusedLocals": true,                       // Báo lỗi nếu khai báo biến nhưng không dùng
+    "noUnusedParameters": true                    // Báo lỗi nếu tham số function không dùng
+  },
+  "include": ["src"],                            
+  "exclude": ["node_modules", "dist"]            // Loại trừ
+}
