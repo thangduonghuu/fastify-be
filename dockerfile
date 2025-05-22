@@ -20,7 +20,7 @@ COPY . .
 RUN pnpm build
 
 # Expose app port
-EXPOSE 3000
+EXPOSE 3005
 
 # Start the app
 CMD ["pnpm", "start"]
