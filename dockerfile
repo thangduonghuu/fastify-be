@@ -11,7 +11,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies (force lockfile regeneration if incompatible)
-RUN pnpm install --force
+RUN pnpm install --frozen-lockfile
 
 # Copy the rest of the source code
 COPY . .
